@@ -31,6 +31,7 @@ This repository is being developed incrementally, with each stage documented tra
 ## Business Problem
 
 Unexpected machine failures can interrupt production, increase maintenance costs, and reduce operational efficiency.  
+
 The objective of predictive maintenance is to identify risky operating conditions early enough to support proactive maintenance decisions before breakdown occurs.
 
 This project addresses that problem by building a machine learning system that predicts whether a machine is likely to fail based on variables such as:
