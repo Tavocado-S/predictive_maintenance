@@ -189,14 +189,14 @@ This project is being built step by step. The current progress is:
 - baseline model training
 - baseline model comparison using stratified cross-validation
 - test-set evaluation of the selected baseline model
+- interpretation of baseline model results
 
 ### In Progress
-- interpretation of baseline model results
 - planning the next model-improvement step
-
-### Planned
 - hyperparameter tuning
 - interpretability analysis
+
+### Planned
 - experiment tracking
 - API-based model serving
 - Dockerization
