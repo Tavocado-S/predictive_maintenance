@@ -200,14 +200,15 @@ This project is being built step by step. The current progress is:
 - feature-target relationship analysis
 - product-type failure-rate analysis
 - identification of leakage-related columns
+- preprocessing pipeline implementation
+- feature engineering for the modeling dataset
+- stratified train-test split
+- export of processed train/test datasets for modeling
 
 ### In Progress
-- preprocessing plan
-- feature engineering plan
-- modeling workflow design
+- baseline modeling and evaluation workflow design
 
 ### Planned
-- preprocessing pipeline implementation
 - baseline model training and evaluation
 - model comparison
 - interpretability analysis
@@ -236,24 +237,23 @@ These findings suggest that torque, tool wear, rotational speed, and product typ
 
 ## Next Steps
 
+## Next Steps
+
 The next development steps are:
 
-1. Prepare the modeling dataset
-   - remove identifier and leakage-related columns
-   - encode the categorical variable `Type`
-   - create train/test splits
-
-2. Train baseline classification models
+1. Train baseline classification models
    - Logistic Regression
    - Decision Tree
    - Random Forest
    - optional gradient boosting model
 
-3. Evaluate models using metrics appropriate for imbalanced classification
+2. Evaluate models using metrics appropriate for imbalanced classification
    - Recall
    - Precision
    - F1-score
    - ROC-AUC
+
+3. Compare baseline model performance and identify the strongest candidate
 
 4. Refactor preprocessing and training logic into reusable scripts
 
@@ -311,11 +311,13 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-### 4. Start with the notebook
-Open the `notebooks/` folder and begin with:
+### 4. Start with the notebooks
+Open the `notebooks/` folder and follow the project step by step:
 
 - `01_data_understanding_eda.ipynb`
+- `02_preprocessing_and_feature_engineering.ipynb`
 
+The processed train/test datasets generated in Notebook 02 are saved in `data/processed/` and can be used in the next modeling stage.
 ---
 
 ## Transparency Note
