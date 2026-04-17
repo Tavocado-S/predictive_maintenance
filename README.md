@@ -134,24 +134,6 @@ predictive-maintenance-ai4i/
 │   ├── 01_data_understanding_eda.ipynb
 │   ├── 02_preprocessing_and_feature_engineering.ipynb
 │   ├── 03_modeling_and_evaluation.ipynb
-│   └── 04_interpretability_and_conclusions.ipynb
-│
-├── src/
-│   ├── __init__.py
-│   ├── data_loading.py
-│   ├── preprocessing.py
-│   ├── feature_engineering.py
-│   ├── train.py
-│   ├── evaluate.py
-│   └── predict.py
-│
-├── models/
-├── reports/
-│   ├── figures/
-│   └── tables/
-│
-├── app/
-│   └── main.py
 │
 ├── requirements.txt
 ├── README.md
@@ -166,8 +148,8 @@ The Data Science workflow for this project is planned as follows:
 
 1. Data understanding and exploratory data analysis  
 2. Preprocessing and feature engineering  
-3. Baseline model training  
-4. Model evaluation  
+3. Baseline model training and comparison  
+4. Test-set evaluation  
 5. Model interpretation  
 
 ---
@@ -204,13 +186,16 @@ This project is being built step by step. The current progress is:
 - feature engineering for the modeling dataset
 - stratified train-test split
 - export of processed train/test datasets for modeling
+- baseline model training
+- baseline model comparison using stratified cross-validation
+- test-set evaluation of the selected baseline model
 
 ### In Progress
-- baseline modeling and evaluation workflow design
+- interpretation of baseline model results
+- planning the next model-improvement step
 
 ### Planned
-- baseline model training and evaluation
-- model comparison
+- hyperparameter tuning
 - interpretability analysis
 - experiment tracking
 - API-based model serving
@@ -233,27 +218,37 @@ The exploratory analysis produced the following main findings:
 
 These findings suggest that torque, tool wear, rotational speed, and product type may be especially relevant for prediction, while the failure-mode columns must be excluded from the feature set to avoid leakage.
 
----
+## Key Outcomes from Preprocessing
 
-## Next Steps
+- Leakage-prone failure-mode columns and identifier columns were removed from the modeling feature set.
+- Two engineered features were added: `Temperature difference [K]` and `Tool wear x Torque`.
+- A stratified train-test split and reproducible preprocessing pipelines were implemented.
+- The processed train/test datasets were exported for the next modeling stage.
+
+## Baseline Modeling Findings
+
+Three baseline models were compared for machine failure prediction: Dummy Classifier, Logistic Regression, and Random Forest.
+
+The main findings from the baseline modeling stage are:
+
+- Random Forest is the strongest baseline model overall
+- Logistic Regression achieves higher recall, but with much lower precision
+- the Dummy Classifier confirms that accuracy alone is misleading for this imbalanced problem
+- the selected Random Forest baseline achieves high precision for the failure class, but still misses part of the true failure cases
+
+These results establish a credible modeling baseline and indicate that the next improvement step should focus on increasing failure detection while controlling false positives.
+
+---
 
 ## Next Steps
 
 The next development steps are:
 
-1. Train baseline classification models
-   - Logistic Regression
-   - Decision Tree
-   - Random Forest
-   - optional gradient boosting model
+1. Improve the selected baseline model through hyperparameter tuning
 
-2. Evaluate models using metrics appropriate for imbalanced classification
-   - Recall
-   - Precision
-   - F1-score
-   - ROC-AUC
+2. Analyze whether threshold adjustment can improve failure detection performance
 
-3. Compare baseline model performance and identify the strongest candidate
+3. Extend the project with interpretability methods to better understand model behavior
 
 4. Refactor preprocessing and training logic into reusable scripts
 
@@ -316,6 +311,7 @@ Open the `notebooks/` folder and follow the project step by step:
 
 - `01_data_understanding_eda.ipynb`
 - `02_preprocessing_and_feature_engineering.ipynb`
+- `03_model_training_and_evaluation.ipynb`
 
 The processed train/test datasets generated in Notebook 02 are saved in `data/processed/` and can be used in the next modeling stage.
 ---
