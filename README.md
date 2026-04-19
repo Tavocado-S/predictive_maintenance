@@ -134,6 +134,7 @@ predictive-maintenance-ai4i/
 │   ├── 01_data_understanding_eda.ipynb
 │   ├── 02_preprocessing_and_feature_engineering.ipynb
 │   ├── 03_modeling_and_evaluation.ipynb
+│   ├── 04_hyperparameter_tuning_random_forest.ipynb
 │
 ├── requirements.txt
 ├── README.md
@@ -144,13 +145,14 @@ predictive-maintenance-ai4i/
 
 ## Data Science Workflow
 
-The Data Science workflow for this project is planned as follows:
+The Data Science workflow for this project is progressing through the following stages:
 
 1. Data understanding and exploratory data analysis  
 2. Preprocessing and feature engineering  
 3. Baseline model training and comparison  
-4. Test-set evaluation  
-5. Model interpretation  
+4. Hyperparameter tuning of the selected model  
+5. Test-set evaluation and model comparison  
+6. Model interpretation  
 
 ---
 
@@ -190,10 +192,14 @@ This project is being built step by step. The current progress is:
 - baseline model comparison using stratified cross-validation
 - test-set evaluation of the selected baseline model
 - interpretation of baseline model results
+- Random Forest hyperparameter tuning using cross-validated randomized search
+- selection of the tuned Random Forest model
+- test-set evaluation of the tuned model
+- comparison between baseline and tuned Random Forest performance
+- interpretation of tuning trade-offs
 
 ### In Progress
 - planning the next model-improvement step
-- hyperparameter tuning
 - interpretability analysis
 
 ### Planned
@@ -238,21 +244,34 @@ The main findings from the baseline modeling stage are:
 
 These results establish a credible modeling baseline and indicate that the next improvement step should focus on increasing failure detection while controlling false positives.
 
+## Hyperparameter Tuning Findings
+
+The Random Forest baseline was further improved through cross-validated hyperparameter tuning using **Average Precision** as the optimization metric.
+
+The main findings from this stage are:
+
+- hyperparameter tuning led to a meaningful overall improvement over the baseline model
+- recall improved substantially, meaning the tuned model detects a larger share of true machine failures
+- F1-score also improved, indicating a better balance between precision and recall
+- Average Precision increased slightly, supporting the tuning strategy used
+- precision decreased moderately, meaning the tuned model produces more false positives than the baseline
+- ROC-AUC declined slightly, but remained strong overall
+
+Overall, the tuned Random Forest provides a more useful balance for predictive maintenance, because it identifies more real failures while maintaining strong overall classification performance.
+
 ---
 
 ## Next Steps
 
 The next development steps are:
 
-1. Improve the selected baseline model through hyperparameter tuning
+1. Analyze whether threshold adjustment can further improve failure detection performance
 
-2. Analyze whether threshold adjustment can improve failure detection performance
+2. Extend the project with interpretability methods to better understand model behavior
 
-3. Extend the project with interpretability methods to better understand model behavior
+3. Refactor preprocessing and training logic into reusable scripts
 
-4. Refactor preprocessing and training logic into reusable scripts
-
-5. Extend the project toward MLOps components such as experiment tracking and model serving
+4. Extend the project toward MLOps components such as experiment tracking and model serving
 
 ---
 
@@ -312,8 +331,10 @@ Open the `notebooks/` folder and follow the project step by step:
 - `01_data_understanding_eda.ipynb`
 - `02_preprocessing_and_feature_engineering.ipynb`
 - `03_model_training_and_evaluation.ipynb`
+- `04_hyperparameter_tuning_random_forest.ipynb`
 
 The processed train/test datasets generated in Notebook 02 are saved in `data/processed/` and can be used in the next modeling stage.
+
 ---
 
 ## Transparency Note
