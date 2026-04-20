@@ -133,8 +133,9 @@ predictive-maintenance-ai4i/
 ├── notebooks/
 │   ├── 01_data_understanding_eda.ipynb
 │   ├── 02_preprocessing_and_feature_engineering.ipynb
-│   ├── 03_modeling_and_evaluation.ipynb
+│   ├── 03_model_training_and_evaluation.ipynb
 │   ├── 04_hyperparameter_tuning_random_forest.ipynb
+│   ├── 05_xgboost_challenger_model.ipynb
 │
 ├── requirements.txt
 ├── README.md
@@ -150,8 +151,8 @@ The Data Science workflow for this project is progressing through the following 
 1. Data understanding and exploratory data analysis  
 2. Preprocessing and feature engineering  
 3. Baseline model training and comparison  
-4. Hyperparameter tuning of the selected model  
-5. Test-set evaluation and model comparison  
+4. Hyperparameter tuning of the selected baseline model  
+5. Challenger-model evaluation and final comparison  
 6. Model interpretation  
 
 ---
@@ -174,6 +175,7 @@ The MLOps workflow is planned as a later extension of the project and is intende
 This project is being built step by step. The current progress is:
 
 ### Completed
+### Completed
 - repository setup
 - dataset loading
 - exploratory data analysis (EDA)
@@ -194,20 +196,24 @@ This project is being built step by step. The current progress is:
 - interpretation of baseline model results
 - Random Forest hyperparameter tuning using cross-validated randomized search
 - selection of the tuned Random Forest model
-- test-set evaluation of the tuned model
+- test-set evaluation of the tuned Random Forest model
 - comparison between baseline and tuned Random Forest performance
-- interpretation of tuning trade-offs
+- interpretation of Random Forest tuning trade-offs
+- baseline XGBoost training and evaluation
+- XGBoost hyperparameter tuning using cross-validated randomized search
+- test-set evaluation of the tuned XGBoost model
+- comparison between tuned Random Forest and tuned XGBoost
+- selection of the tuned Random Forest as the preferred model candidate 
 
 ### In Progress
-- planning the next model-improvement step
 - interpretability analysis
 
 ### Planned
+- threshold analysis
 - experiment tracking
 - API-based model serving
 - Dockerization
 - workflow automation
-
 ---
 
 ## Key Findings from EDA
@@ -259,20 +265,34 @@ The main findings from this stage are:
 
 Overall, the tuned Random Forest provides a more useful balance for predictive maintenance, because it identifies more real failures while maintaining strong overall classification performance.
 
+## XGBoost Challenger Findings
+
+XGBoost was evaluated as a challenger model to test whether it could outperform the tuned Random Forest under the same prepared data, cross-validation logic, and evaluation framework.
+
+The main findings from this stage are:
+
+- the baseline XGBoost model already showed strong performance, confirming that it was a credible challenger
+- after tuning, XGBoost achieved slightly higher ROC-AUC and Average Precision than the tuned Random Forest
+- however, recall remained the same as the tuned Random Forest
+- precision was substantially lower than the tuned Random Forest
+- as a result, XGBoost produced more false-positive predictions without improving failure detection
+- the tuned Random Forest therefore remained the stronger overall model candidate at the current operating point
+
+Overall, the challenger-model comparison strengthened the conclusion that the tuned Random Forest provides the better balance between detecting machine failures and avoiding unnecessary false alarms.
+
 ---
 
 ## Next Steps
 
 The next development steps are:
 
-1. Analyze whether threshold adjustment can further improve failure detection performance
+1. Analyze whether threshold adjustment can improve the balance between failure detection and false alarms
 
 2. Extend the project with interpretability methods to better understand model behavior
 
 3. Refactor preprocessing and training logic into reusable scripts
 
 4. Extend the project toward MLOps components such as experiment tracking and model serving
-
 ---
 
 ## Tech Stack
@@ -284,6 +304,7 @@ The next development steps are:
 - matplotlib
 - seaborn
 - scikit-learn
+- XGBoost
 - Jupyter Notebook
 
 ### Planned
@@ -332,8 +353,9 @@ Open the `notebooks/` folder and follow the project step by step:
 - `02_preprocessing_and_feature_engineering.ipynb`
 - `03_model_training_and_evaluation.ipynb`
 - `04_hyperparameter_tuning_random_forest.ipynb`
+- `05_xgboost_challenger_model.ipynb`
 
-The processed train/test datasets generated in Notebook 02 are saved in `data/processed/` and can be used in the next modeling stage.
+The processed train/test datasets generated in Notebook 02 are saved in `data/processed/` and are reused in the later modeling notebooks.
 
 ---
 
