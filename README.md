@@ -136,6 +136,7 @@ predictive-maintenance-ai4i/
 │   ├── 03_model_training_and_evaluation.ipynb
 │   ├── 04_hyperparameter_tuning_random_forest.ipynb
 │   ├── 05_xgboost_challenger_model.ipynb
+│   ├── 06_threshold_analysis_random_forest.ipynb
 │
 ├── requirements.txt
 ├── README.md
@@ -153,7 +154,8 @@ The Data Science workflow for this project is progressing through the following 
 3. Baseline model training and comparison  
 4. Hyperparameter tuning of the selected baseline model  
 5. Challenger-model evaluation and final comparison  
-6. Model interpretation  
+6. Threshold analysis of the selected model  
+7. Model interpretation  
 
 ---
 
@@ -174,7 +176,6 @@ The MLOps workflow is planned as a later extension of the project and is intende
 
 This project is being built step by step. The current progress is:
 
-### Completed
 ### Completed
 - repository setup
 - dataset loading
@@ -204,16 +205,18 @@ This project is being built step by step. The current progress is:
 - test-set evaluation of the tuned XGBoost model
 - comparison between tuned Random Forest and tuned XGBoost
 - selection of the tuned Random Forest as the preferred model candidate 
+- threshold analysis of the tuned Random Forest
+- confirmation that the default threshold of 0.50 remains the preferred operating point
 
 ### In Progress
 - interpretability analysis
 
 ### Planned
-- threshold analysis
 - experiment tracking
 - API-based model serving
 - Dockerization
 - workflow automation
+
 ---
 
 ## Key Findings from EDA
@@ -280,19 +283,33 @@ The main findings from this stage are:
 
 Overall, the challenger-model comparison strengthened the conclusion that the tuned Random Forest provides the better balance between detecting machine failures and avoiding unnecessary false alarms.
 
+## Threshold Analysis Findings
+
+The tuned Random Forest was further evaluated across multiple decision thresholds to determine whether a different cutoff could improve the balance between failure detection and false alarms.
+
+The main findings from this stage are:
+
+- threshold analysis showed the expected trade-off between precision and recall
+- lower thresholds increased recall but reduced precision
+- higher thresholds increased precision but reduced recall
+- the best-performing threshold region was effectively the same as the default threshold of 0.50
+- no meaningfully better operating point was identified
+- the default threshold of 0.50 therefore remains the preferred decision threshold for the tuned Random Forest on the test set
+
+Overall, this analysis showed that the selected tuned Random Forest already operates at a strong and well-balanced decision point, so no threshold adjustment is currently justified.
+
 ---
 
 ## Next Steps
 
 The next development steps are:
 
-1. Analyze whether threshold adjustment can improve the balance between failure detection and false alarms
+1. Extend the project with interpretability methods to better understand model behavior
 
-2. Extend the project with interpretability methods to better understand model behavior
+2. Refactor preprocessing and training logic into reusable scripts
 
-3. Refactor preprocessing and training logic into reusable scripts
+3. Extend the project toward MLOps components such as experiment tracking and model serving
 
-4. Extend the project toward MLOps components such as experiment tracking and model serving
 ---
 
 ## Tech Stack
@@ -354,6 +371,7 @@ Open the `notebooks/` folder and follow the project step by step:
 - `03_model_training_and_evaluation.ipynb`
 - `04_hyperparameter_tuning_random_forest.ipynb`
 - `05_xgboost_challenger_model.ipynb`
+- `06_threshold_analysis_random_forest.ipynb`
 
 The processed train/test datasets generated in Notebook 02 are saved in `data/processed/` and are reused in the later modeling notebooks.
 
