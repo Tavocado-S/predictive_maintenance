@@ -137,6 +137,7 @@ predictive-maintenance-ai4i/
 │   ├── 04_hyperparameter_tuning_random_forest.ipynb
 │   ├── 05_xgboost_challenger_model.ipynb
 │   ├── 06_threshold_analysis_random_forest.ipynb
+│   ├── 07_model_interpretability_random_forest.ipynb
 │
 ├── requirements.txt
 ├── README.md
@@ -204,12 +205,14 @@ This project is being built step by step. The current progress is:
 - XGBoost hyperparameter tuning using cross-validated randomized search
 - test-set evaluation of the tuned XGBoost model
 - comparison between tuned Random Forest and tuned XGBoost
-- selection of the tuned Random Forest as the preferred model candidate 
+- selection of the tuned Random Forest as the preferred model candidate
 - threshold analysis of the tuned Random Forest
 - confirmation that the default threshold of 0.50 remains the preferred operating point
-
-### In Progress
-- interpretability analysis
+- interpretability analysis of the tuned Random Forest
+- built-in feature importance analysis
+- permutation importance analysis
+- SHAP-based global and local explanations
+- comparison of interpretability methods for the final model
 
 ### Planned
 - experiment tracking
@@ -298,17 +301,29 @@ The main findings from this stage are:
 
 Overall, this analysis showed that the selected tuned Random Forest already operates at a strong and well-balanced decision point, so no threshold adjustment is currently justified.
 
+## Interpretability Findings
+
+The tuned Random Forest was interpreted using built-in feature importance, permutation importance, and SHAP-based explanations to better understand which variables drive machine-failure predictions.
+
+The main findings from this stage are:
+
+- rotational speed remained the most consistently important feature across the interpretability methods
+- torque, tool wear, Tool wear x Torque, and Temperature difference also showed strong relevance for the final model
+- permutation importance highlighted Temperature difference more strongly than the built-in Random Forest importance
+- SHAP added directional insight, showing how low or high feature values push predictions toward or away from machine failure
+- the overall interpretation was broadly consistent with the earlier exploratory analysis, which strengthens confidence in the final model
+
+Overall, the interpretability analysis showed that the tuned Random Forest is not only a strong predictive model, but also a model whose behavior can be explained in a credible and business-relevant way.
+
 ---
 
 ## Next Steps
 
-The next development steps are:
+1. Refactor preprocessing and training logic into reusable scripts
 
-1. Extend the project with interpretability methods to better understand model behavior
+2. Extend the project toward MLOps components such as experiment tracking and model serving
 
-2. Refactor preprocessing and training logic into reusable scripts
-
-3. Extend the project toward MLOps components such as experiment tracking and model serving
+3. Add model artifact persistence and reusable inference components
 
 ---
 
@@ -322,6 +337,7 @@ The next development steps are:
 - seaborn
 - scikit-learn
 - XGBoost
+- SHAP
 - Jupyter Notebook
 
 ### Planned
@@ -372,6 +388,7 @@ Open the `notebooks/` folder and follow the project step by step:
 - `04_hyperparameter_tuning_random_forest.ipynb`
 - `05_xgboost_challenger_model.ipynb`
 - `06_threshold_analysis_random_forest.ipynb`
+- `07_model_interpretability_random_forest.ipynb`
 
 The processed train/test datasets generated in Notebook 02 are saved in `data/processed/` and are reused in the later modeling notebooks.
 
