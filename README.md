@@ -91,6 +91,20 @@ This project uses the **AI4I 2020 Predictive Maintenance Dataset**, which contai
 
 These failure-mode columns are useful for understanding the dataset, but they should not be used as predictors for `Machine failure`, since they are outcome-related labels and would introduce data leakage.
 
+### Data access
+
+The raw dataset is not stored in this repository.
+
+To run the project from the beginning, download the **AI4I 2020 Predictive Maintenance Dataset** manually and place the raw CSV file in:
+
+`data/raw/ai4i2020.csv`
+
+The raw dataset is loaded from `data/raw/ai4i2020.csv`.
+
+The project now includes a reusable preprocessing script, `src/make_dataset.py`, which loads the raw dataset, applies the established feature engineering and preprocessing steps, and saves the processed train/test datasets to `data/processed/`.
+
+Notebook 02 still documents the preprocessing and feature-engineering stage in an exploratory and transparent way, while the script provides a more reusable project component for later modeling and MLOps-oriented steps.
+
 ---
 
 ## Problem Formulation
@@ -139,6 +153,9 @@ predictive-maintenance-ai4i/
 │   ├── 06_threshold_analysis_random_forest.ipynb
 │   ├── 07_model_interpretability_random_forest.ipynb
 │
+├── src/
+│   └── make_dataset.py
+│
 ├── requirements.txt
 ├── README.md
 └── .gitignore
@@ -162,14 +179,17 @@ The Data Science workflow for this project is progressing through the following 
 
 ## MLOps Workflow
 
-The MLOps workflow is planned as a later extension of the project and is intended to include:
+The MLOps workflow is beginning to be introduced as a reusable extension of the notebook-based analysis.
 
-1. Reusable training scripts  
-2. Experiment tracking  
-3. Model artifact storage  
-4. API-based inference  
-5. Containerization  
-6. Optional workflow automation  
+Current and planned MLOps-oriented steps include:
+
+1. Reusable data-preparation scripts  
+2. Reusable training and artifact-saving scripts  
+3. Experiment tracking  
+4. Model artifact storage  
+5. API-based inference  
+6. Containerization  
+7. Optional workflow automation
 
 ---
 
@@ -192,6 +212,7 @@ This project is being built step by step. The current progress is:
 - feature engineering for the modeling dataset
 - stratified train-test split
 - export of processed train/test datasets for modeling
+- creation of a reusable preprocessing script (`src/make_dataset.py`) to generate processed train/test datasets from the raw CSV
 - baseline model training
 - baseline model comparison using stratified cross-validation
 - test-set evaluation of the selected baseline model
@@ -319,12 +340,11 @@ Overall, the interpretability analysis showed that the tuned Random Forest is no
 
 ## Next Steps
 
-1. Refactor preprocessing and training logic into reusable scripts
+1. Extend the script-based workflow by adding a reusable model-training and artifact-saving script
 
-2. Extend the project toward MLOps components such as experiment tracking and model serving
+2. Continue the transition from notebook-based steps toward more modular MLOps components
 
-3. Add model artifact persistence and reusable inference components
-
+3. Extend the project toward experiment tracking, model serving, and reusable inference components
 ---
 
 ## Tech Stack
@@ -339,6 +359,7 @@ Overall, the interpretability analysis showed that the tuned Random Forest is no
 - XGBoost
 - SHAP
 - Jupyter Notebook
+- script-based preprocessing with Python and scikit-learn pipelines
 
 ### Planned
 - MLflow
@@ -379,7 +400,31 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-### 4. Start with the notebooks
+### 4. Download and place the raw dataset
+
+Download the **AI4I 2020 Predictive Maintenance Dataset** manually and place the raw CSV file in:
+
+`data/raw/ai4i2020.csv`
+
+Then run the notebooks in order. Notebook 02 generates the processed train/test datasets in `data/processed/`, and those processed files are reused in the later modeling notebooks.
+
+### 5. Generate the processed datasets
+
+Run the reusable preprocessing script from the project root:
+```bash
+python src/make_dataset.py
+```
+This script:
+
+loads the raw dataset from data/raw/ai4i2020.csv
+applies the established feature engineering and preprocessing steps
+creates a stratified train-test split
+saves the processed outputs to data/processed/
+
+If files with the same names already exist in data/processed/, they are overwritten.
+
+
+### 6. Open notebooks
 Open the `notebooks/` folder and follow the project step by step:
 
 - `01_data_understanding_eda.ipynb`
@@ -390,7 +435,7 @@ Open the `notebooks/` folder and follow the project step by step:
 - `06_threshold_analysis_random_forest.ipynb`
 - `07_model_interpretability_random_forest.ipynb`
 
-The processed train/test datasets generated in Notebook 02 are saved in `data/processed/` and are reused in the later modeling notebooks.
+Notebook 02 documents the preprocessing logic transparently, while the reusable script src/make_dataset.py provides the script-based version of that step for the evolving project workflow.
 
 ---
 
