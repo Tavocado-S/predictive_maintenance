@@ -93,13 +93,9 @@ These failure-mode columns are useful for understanding the dataset, but they sh
 
 ### Data access
 
-The raw dataset is not stored in this repository.
-
 To run the project from the beginning, download the **AI4I 2020 Predictive Maintenance Dataset** manually and place the raw CSV file in:
 
 `data/raw/ai4i2020.csv`
-
-The raw dataset is loaded from `data/raw/ai4i2020.csv`.
 
 The project now includes a reusable preprocessing script, `src/make_dataset.py`, which loads the raw dataset, applies the established feature engineering and preprocessing steps, and saves the processed train/test datasets to `data/processed/`.
 
@@ -155,6 +151,7 @@ predictive-maintenance-ai4i/
 │
 ├── src/
 │   └── make_dataset.py
+│   └── train_and_save_model.py
 │
 ├── requirements.txt
 ├── README.md
@@ -359,7 +356,6 @@ Overall, the interpretability analysis showed that the tuned Random Forest is no
 - XGBoost
 - SHAP
 - Jupyter Notebook
-- script-based preprocessing with Python and scikit-learn pipelines
 
 ### Planned
 - MLflow
@@ -406,25 +402,24 @@ Download the **AI4I 2020 Predictive Maintenance Dataset** manually and place the
 
 `data/raw/ai4i2020.csv`
 
-Then run the notebooks in order. Notebook 02 generates the processed train/test datasets in `data/processed/`, and those processed files are reused in the later modeling notebooks.
-
 ### 5. Generate the processed datasets
 
 Run the reusable preprocessing script from the project root:
+
 ```bash
 python src/make_dataset.py
 ```
 This script:
 
-loads the raw dataset from data/raw/ai4i2020.csv
-applies the established feature engineering and preprocessing steps
-creates a stratified train-test split
-saves the processed outputs to data/processed/
+- loads the raw dataset from data/raw/ai4i2020.csv
+- applies the established feature engineering and preprocessing steps
+- creates a stratified train-test split
+- saves the processed outputs to data/processed/
 
 If files with the same names already exist in data/processed/, they are overwritten.
 
 
-### 6. Open notebooks
+### 6. Run the notebooks
 Open the `notebooks/` folder and follow the project step by step:
 
 - `01_data_understanding_eda.ipynb`
@@ -435,7 +430,7 @@ Open the `notebooks/` folder and follow the project step by step:
 - `06_threshold_analysis_random_forest.ipynb`
 - `07_model_interpretability_random_forest.ipynb`
 
-Notebook 02 documents the preprocessing logic transparently, while the reusable script src/make_dataset.py provides the script-based version of that step for the evolving project workflow.
+Notebook 02 documents the preprocessing logic transparently, while the reusable script `src/make_dataset.py` provides the script-based version of that step for the evolving project workflow.
 
 ---
 
