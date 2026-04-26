@@ -136,6 +136,10 @@ These columns are excluded from the modeling feature set because they are either
 ```bash
 predictive-maintenance-ai4i/
 │
+│
+├── artifacts/
+│   └── model/
+│
 ├── data/
 │   ├── raw/
 │   └── processed/
@@ -150,7 +154,7 @@ predictive-maintenance-ai4i/
 │   ├── 07_model_interpretability_random_forest.ipynb
 │
 ├── src/
-│   └── make_dataset.py
+│   ├── make_dataset.py
 │   └── train_and_save_model.py
 │
 ├── requirements.txt
@@ -181,7 +185,7 @@ The MLOps workflow is beginning to be introduced as a reusable extension of the 
 Current and planned MLOps-oriented steps include:
 
 1. Reusable data-preparation scripts  
-2. Reusable training and artifact-saving scripts  
+2. Reusable model-training and model-saving scripts  
 3. Experiment tracking  
 4. Model artifact storage  
 5. API-based inference  
@@ -210,6 +214,9 @@ This project is being built step by step. The current progress is:
 - stratified train-test split
 - export of processed train/test datasets for modeling
 - creation of a reusable preprocessing script (`src/make_dataset.py`) to generate processed train/test datasets from the raw CSV
+- creation of a reusable model-training script (`src/train_and_save_model.py`) to train the final tuned Random Forest from the processed datasets
+- saving of reusable model output files for the final trained model
+- verification that the saved model can be reloaded and produces matching predictions and probabilities
 - baseline model training
 - baseline model comparison using stratified cross-validation
 - test-set evaluation of the selected baseline model
@@ -337,11 +344,12 @@ Overall, the interpretability analysis showed that the tuned Random Forest is no
 
 ## Next Steps
 
-1. Extend the script-based workflow by adding a reusable model-training and artifact-saving script
+1. Extend the script-based workflow further by adding reusable inference and evaluation components
 
 2. Continue the transition from notebook-based steps toward more modular MLOps components
 
-3. Extend the project toward experiment tracking, model serving, and reusable inference components
+3. Extend the project toward experiment tracking, model serving, and workflow automation
+
 ---
 
 ## Tech Stack
@@ -411,15 +419,31 @@ python src/make_dataset.py
 ```
 This script:
 
-- loads the raw dataset from data/raw/ai4i2020.csv
+- loads the raw dataset from `data/raw/ai4i2020.csv`
 - applies the established feature engineering and preprocessing steps
 - creates a stratified train-test split
-- saves the processed outputs to data/processed/
+- saves the processed outputs to `data/processed/`
 
-If files with the same names already exist in data/processed/, they are overwritten.
+If files with the same names already exist in `data/processed/`, they are overwritten.
 
+### 6. Train the final model and save reusable model files
 
-### 6. Run the notebooks
+Run the training script from the project root:
+
+```bash
+python src/train_and_save_model.py
+```
+
+This script:
+
+loads the processed train/test datasets from data/processed/
+rebuilds and trains the final tuned Random Forest model
+saves the trained model, feature names, and model metadata to artifacts/model/
+reloads the saved model and verifies consistency on sample test data
+
+Generated files in artifacts/ are local outputs and are not intended to be tracked in Git.
+
+### 7. Run the notebooks
 Open the `notebooks/` folder and follow the project step by step:
 
 - `01_data_understanding_eda.ipynb`
