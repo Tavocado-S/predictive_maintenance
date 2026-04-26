@@ -136,7 +136,6 @@ These columns are excluded from the modeling feature set because they are either
 ```bash
 predictive-maintenance-ai4i/
 │
-│
 ├── artifacts/
 │   └── model/
 │
@@ -417,6 +416,7 @@ Run the reusable preprocessing script from the project root:
 ```bash
 python src/make_dataset.py
 ```
+
 This script:
 
 - loads the raw dataset from `data/raw/ai4i2020.csv`
@@ -436,12 +436,12 @@ python src/train_and_save_model.py
 
 This script:
 
-loads the processed train/test datasets from data/processed/
-rebuilds and trains the final tuned Random Forest model
-saves the trained model, feature names, and model metadata to artifacts/model/
-reloads the saved model and verifies consistency on sample test data
+- loads the processed train/test datasets from `data/processed/`
+- rebuilds and trains the final tuned Random Forest model
+- saves the trained model, feature names, and model metadata to `artifacts/model/`
+- reloads the saved model and verifies consistency on sample test data
 
-Generated files in artifacts/ are local outputs and are not intended to be tracked in Git.
+Generated files in `artifacts/` are local outputs and are not intended to be tracked in Git.
 
 ### 7. Run the notebooks
 Open the `notebooks/` folder and follow the project step by step:
