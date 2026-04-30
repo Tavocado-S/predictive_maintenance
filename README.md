@@ -154,7 +154,8 @@ predictive-maintenance-ai4i/
 │
 ├── src/
 │   ├── make_dataset.py
-│   └── train_and_save_model.py
+│   ├── train_and_save_model.py
+│   └── predict_with_saved_model.py
 │
 ├── requirements.txt
 ├── README.md
@@ -185,11 +186,12 @@ Current and planned MLOps-oriented steps include:
 
 1. Reusable data-preparation scripts  
 2. Reusable model-training and model-saving scripts  
-3. Experiment tracking  
-4. Model artifact storage  
-5. API-based inference  
-6. Containerization  
-7. Optional workflow automation
+3. Reusable inference script using the saved model  
+4. Experiment tracking  
+5. Model artifact storage  
+6. API-based inference  
+7. Containerization  
+8. Optional workflow automation
 
 ---
 
@@ -216,6 +218,7 @@ This project is being built step by step. The current progress is:
 - creation of a reusable model-training script (`src/train_and_save_model.py`) to train the final tuned Random Forest from the processed datasets
 - saving of reusable model output files for the final trained model
 - verification that the saved model can be reloaded and produces matching predictions and probabilities
+- creation of a reusable inference script (`src/predict_with_saved_model.py`) to load the saved model and generate predictions on prepared input data
 - baseline model training
 - baseline model comparison using stratified cross-validation
 - test-set evaluation of the selected baseline model
@@ -343,7 +346,7 @@ Overall, the interpretability analysis showed that the tuned Random Forest is no
 
 ## Next Steps
 
-1. Extend the script-based workflow further by adding reusable inference and evaluation components
+1. Extend the script-based workflow further by adding reusable evaluation components
 
 2. Continue the transition from notebook-based steps toward more modular MLOps components
 
@@ -443,7 +446,26 @@ This script:
 
 Generated files in `artifacts/` are local outputs and are not intended to be tracked in Git.
 
-### 7. Run the notebooks
+### 7. Run inference with the saved model
+
+Run the reusable inference script from the project root:
+
+```bash
+python src/predict_with_saved_model.py
+```
+
+This script:
+
+- loads the saved Random Forest model from artifacts/model/
+- loads the saved feature names
+- loads a small sample from data/processed/X_test_prepared.csv
+- aligns the input columns with the saved feature names
+- generates machine-failure predictions and failure probabilities
+- prints the prediction results in the terminal
+
+The script does not create new files. It only serves to demonstrate reusable inference with the saved model.
+
+### 8. Run the notebooks
 Open the `notebooks/` folder and follow the project step by step:
 
 - `01_data_understanding_eda.ipynb`
