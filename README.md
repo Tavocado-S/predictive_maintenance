@@ -155,7 +155,8 @@ predictive-maintenance-ai4i/
 ├── src/
 │   ├── make_dataset.py
 │   ├── train_and_save_model.py
-│   └── predict_with_saved_model.py
+│   ├── predict_with_saved_model.py
+│   └── evaluate_model.py
 │
 ├── requirements.txt
 ├── README.md
@@ -184,14 +185,15 @@ The MLOps workflow is beginning to be introduced as a reusable extension of the 
 
 Current and planned MLOps-oriented steps include:
 
-1. Reusable data-preparation scripts  
-2. Reusable model-training and model-saving scripts  
+1. Reusable data-preparation script  
+2. Reusable model-training and model-saving script  
 3. Reusable inference script using the saved model  
-4. Experiment tracking  
-5. Model artifact storage  
-6. API-based inference  
-7. Containerization  
-8. Optional workflow automation
+4. Reusable evaluation script for the saved model  
+5. Experiment tracking  
+6. Model artifact storage  
+7. API-based inference  
+8. Containerization  
+9. Optional workflow automation
 
 ---
 
@@ -219,6 +221,7 @@ This project is being built step by step. The current progress is:
 - saving of reusable model output files for the final trained model
 - verification that the saved model can be reloaded and produces matching predictions and probabilities
 - creation of a reusable inference script (`src/predict_with_saved_model.py`) to load the saved model and generate predictions on prepared input data
+- creation of a reusable evaluation script (`src/evaluate_model.py`) to load the saved model, evaluate it on the processed test set, and print key classification metrics
 - baseline model training
 - baseline model comparison using stratified cross-validation
 - test-set evaluation of the selected baseline model
@@ -346,11 +349,11 @@ Overall, the interpretability analysis showed that the tuned Random Forest is no
 
 ## Next Steps
 
-1. Extend the script-based workflow further by adding reusable evaluation components
+1. Continue the transition from notebook-based steps toward more modular MLOps components
 
-2. Continue the transition from notebook-based steps toward more modular MLOps components
+2. Add experiment tracking for model training and evaluation
 
-3. Extend the project toward experiment tracking, model serving, and workflow automation
+3. Extend the project toward model serving, containerization, and workflow automation
 
 ---
 
@@ -465,7 +468,28 @@ This script:
 
 The script does not create new files. It only serves to demonstrate reusable inference with the saved model.
 
-### 8. Run the notebooks
+### 8. Evaluate the saved model
+
+Run the reusable evaluation script from the project root:
+
+```bash
+python src/evaluate_model.py
+```
+
+This script:
+
+- loads the saved Random Forest model from artifacts/model/
+- loads the saved feature names
+- loads the processed test dataset from data/processed/
+- aligns the test columns with the saved feature names
+- generates predictions and failure probabilities
+- prints Precision, Recall, F1-score, ROC-AUC, and Average Precision
+- prints and displays the confusion matrix
+
+The script does not create new files. It evaluates the already saved model on the processed test set.
+
+
+### 9. Run the notebooks
 Open the `notebooks/` folder and follow the project step by step:
 
 - `01_data_understanding_eda.ipynb`
