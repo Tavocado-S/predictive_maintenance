@@ -1,3 +1,20 @@
+"""
+Create processed train and test datasets for binary machine failure prediction.
+
+This script loads the raw AI4I 2020 dataset, adds the engineered features
+defined during the notebook analysis, removes leakage-prone and identifier
+columns, applies preprocessing, and saves the processed train/test datasets.
+
+Inputs:
+- data/raw/ai4i2020.csv
+
+Outputs:
+- data/processed/X_train_prepared.csv
+- data/processed/X_test_prepared.csv
+- data/processed/y_train.csv
+- data/processed/y_test.csv
+"""
+
 from pathlib import Path
 import pandas as pd
 

@@ -1,3 +1,23 @@
+"""
+Train and save the final Random Forest model.
+
+This script loads the processed train and test datasets, trains the tuned
+Random Forest model selected during notebook experimentation, saves the model
+artifact, saves the training feature names, stores basic model metadata, and
+checks that the saved model can be reloaded consistently.
+
+Inputs:
+- data/processed/X_train_prepared.csv
+- data/processed/X_test_prepared.csv
+- data/processed/y_train.csv
+- data/processed/y_test.csv
+
+Outputs:
+- artifacts/model/random_forest_model.joblib
+- artifacts/model/feature_names.json
+- artifacts/model/model_metadata.json
+"""
+
 from pathlib import Path
 import json
 import joblib

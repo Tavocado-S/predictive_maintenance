@@ -1,3 +1,20 @@
+"""
+Run inference with the saved Random Forest model.
+
+This script loads the saved model artifact, loads the saved feature names,
+loads sample rows from the processed test set, aligns the feature order, and
+prints predicted classes and machine failure probabilities.
+
+Inputs:
+- artifacts/model/random_forest_model.joblib
+- artifacts/model/feature_names.json
+- data/processed/X_test_prepared.csv
+
+Outputs:
+- Predictions printed to the console
+- Failure probabilities printed to the console
+"""
+
 from pathlib import Path
 import json
 
