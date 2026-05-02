@@ -156,7 +156,8 @@ predictive-maintenance-ai4i/
 │   ├── make_dataset.py
 │   ├── train_and_save_model.py
 │   ├── predict_with_saved_model.py
-│   └── evaluate_model.py
+│   ├── evaluate_model.py
+│   └── train_with_mlflow.py
 │
 ├── requirements.txt
 ├── README.md
@@ -189,7 +190,7 @@ Current and planned MLOps-oriented steps include:
 2. Reusable model-training and model-saving script  
 3. Reusable inference script using the saved model  
 4. Reusable evaluation script for the saved model  
-5. Experiment tracking  
+5. Initial experiment tracking with MLflow through `src/train_with_mlflow.py`
 6. Model artifact storage  
 7. API-based inference  
 8. Containerization  
@@ -245,11 +246,9 @@ This project is being built step by step. The current progress is:
 - comparison of interpretability methods for the final model
 
 ### Planned
-- experiment tracking
 - API-based model serving
 - Dockerization
 - workflow automation
-
 ---
 
 ## Key Findings from EDA
@@ -351,7 +350,7 @@ Overall, the interpretability analysis showed that the tuned Random Forest is no
 
 1. Continue the transition from notebook-based steps toward more modular MLOps components
 
-2. Add experiment tracking for model training and evaluation
+2. Extend MLflow experiment tracking for future training and evaluation workflows
 
 3. Extend the project toward model serving, containerization, and workflow automation
 
@@ -368,10 +367,10 @@ Overall, the interpretability analysis showed that the tuned Random Forest is no
 - scikit-learn
 - XGBoost
 - SHAP
+- MLflow
 - Jupyter Notebook
 
 ### Planned
-- MLflow
 - FastAPI
 - Docker
 
@@ -449,6 +448,34 @@ This script:
 
 Generated files in `artifacts/` are local outputs and are not intended to be tracked in Git.
 
+### Optional: Run training with MLflow tracking
+```bash
+python src/train_with_mlflow.py
+```
+This script:
+
+- logs model parameters and metrics
+- tracks experiments using MLflow
+- stores runs locally in `mlflow.db`
+- allows inspection via the MLflow UI
+
+To launch the MLflow UI:
+```bash
+mlflow ui
+```
+Then open: http://localhost:5000
+
+To stop the MLflow UI server, press `Ctrl + C` in the terminal where it is running.
+
+Note:  
+Generated files such as:
+
+- `mlflow.db`
+- `mlruns/`
+- `artifacts/model/`
+
+are local outputs and are excluded via `.gitignore`.
+
 ### 7. Run inference with the saved model
 
 Run the reusable inference script from the project root:
@@ -484,7 +511,7 @@ This script:
 - aligns the test columns with the saved feature names
 - generates predictions and failure probabilities
 - prints Precision, Recall, F1-score, ROC-AUC, and Average Precision
-- prints and displays the confusion matrix
+- prints the confusion matrix
 
 The script does not create new files. It evaluates the already saved model on the processed test set.
 
