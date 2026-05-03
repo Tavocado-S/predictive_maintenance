@@ -17,6 +17,7 @@ Outputs:
 
 from pathlib import Path
 import pandas as pd
+import sqlite3
 
 from sklearn.compose import ColumnTransformer
 from sklearn.impute import SimpleImputer
@@ -32,7 +33,8 @@ TARGET_COLUMN = "Machine failure"
 LEAKAGE_COLUMNS = ["TWF", "HDF", "PWF", "OSF", "RNF"]
 IDENTIFIER_COLUMNS = ["UDI", "Product ID"]
 
-RAW_FILENAME = "ai4i2020.csv"
+DATABASE_FILENAME = "predictive_maintenance.db"
+TABLE_NAME = "ai4i_raw"
 
 
 def get_project_root() -> Path:
@@ -42,18 +44,26 @@ def get_project_root() -> Path:
     return Path(__file__).resolve().parents[1]
 
 
-def load_raw_data(raw_path: Path) -> pd.DataFrame:
+def load_raw_data(database_path: Path, table_name: str) -> pd.DataFrame:
     """
-    Load the raw dataset from data/raw/ai4i2020.csv.
+    Load the raw dataset from a SQLite database table.
     """
-    if not raw_path.exists():
+    if not database_path.exists():
         raise FileNotFoundError(
-            f"Raw data file not found: {raw_path}\n"
-            "Place ai4i2020.csv in data/raw/ before running this script."
+            f"Database not found: {database_path}\n"
+            "Run src/create_database.py before running this script."
         )
 
-    return pd.read_csv(raw_path)
+    with sqlite3.connect(database_path) as connection:
+        df = pd.read_sql_query(
+            f"""
+            SELECT *
+            FROM {table_name}
+            """,
+            connection,
+        )
 
+    return df
 
 def add_engineered_features(df: pd.DataFrame) -> pd.DataFrame:
     """
@@ -181,11 +191,11 @@ def save_processed_data(
 def main():
     project_root = get_project_root()
 
-    raw_path = project_root / "data" / "raw" / RAW_FILENAME
+    database_path = project_root / "data" / "database" / DATABASE_FILENAME
     processed_dir = project_root / "data" / "processed"
 
-    print("Loading raw dataset...")
-    df = load_raw_data(raw_path)
+    print("Loading raw dataset from SQLite database...")
+    df = load_raw_data(database_path, TABLE_NAME)
 
     print("Adding engineered features...")
     df = add_engineered_features(df)

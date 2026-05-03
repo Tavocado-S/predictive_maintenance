@@ -6,3 +6,11 @@ __pycache__/
 artifacts/
 mlflow.db
 mlruns/
+
+# SQLite database files
+data/database/*.db
+data/database/*.sqlite
+data/database/*.sqlite3
+
+# Keep database folder structure
+!data/database/.gitkeep

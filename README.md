@@ -141,11 +141,12 @@ predictive-maintenance-ai4i/
 │
 ├── data/
 │   ├── raw/
+│   ├── database/
 │   └── processed/
 │
-├── notebooks/
+├─notebooks/
 │   ├── 01_data_understanding_eda.ipynb
-│   ├── 02_preprocessing_and_feature_engineering.ipynb
+│  ├── 02_preprocessing_and_feature_engineering.ipynb
 │   ├── 03_model_training_and_evaluation.ipynb
 │   ├── 04_hyperparameter_tuning_random_forest.ipynb
 │   ├── 05_xgboost_challenger_model.ipynb
@@ -153,6 +154,7 @@ predictive-maintenance-ai4i/
 │   ├── 07_model_interpretability_random_forest.ipynb
 │
 ├── src/
+│   ├── create_database.py
 │   ├── make_dataset.py
 │   ├── train_and_save_model.py
 │   ├── predict_with_saved_model.py
@@ -245,6 +247,9 @@ This project is being built step by step. The current progress is:
 - permutation importance analysis
 - SHAP-based global and local explanations
 - comparison of interpretability methods for the final model
+- Added a lightweight SQLite database layer for storing the raw AI4I dataset.
+- Created `src/create_database.py` to load the raw CSV into SQLite and run basic SQL validation checks.
+- Updated `src/make_dataset.py` to read raw data from SQLite instead of directly from CSV.
 
 ### Planned
 - API-based model serving
@@ -349,11 +354,8 @@ Overall, the interpretability analysis showed that the tuned Random Forest is no
 
 ## Next Steps
 
-1. Add a lightweight SQL component for data storage and SQL-based exploratory checks
-
-2. Extend the project toward API-based model serving with FastAPI
-
-3. Continue toward containerization and optional workflow automation
+1. Extend the project toward API-based model serving with FastAPI
+2. Continue toward containerization and optional workflow automation
 
 ---
 
@@ -415,7 +417,16 @@ Download the **AI4I 2020 Predictive Maintenance Dataset** manually and place the
 
 `data/raw/ai4i2020.csv`
 
-### 5. Generate the processed datasets
+### 5. Create the SQLite database
+
+```bash
+python src/create_database.py
+```
+This script loads the raw AI4I CSV file from `data/raw/ai4i2020.csv`, creates a local SQLite database at `data/database/predictive_maintenance.db`, and stores the raw data in the table `ai4i_raw`.
+
+It also runs basic validation checks such as row count, failure count, failure rate, failure rate by product type, and missing-value checks.
+
+### 6. Generate the processed datasets
 
 Run the reusable preprocessing script from the project root:
 
@@ -430,9 +441,9 @@ This script:
 - creates a stratified train-test split
 - saves the processed outputs to `data/processed/`
 
-If files with the same names already exist in `data/processed/`, they are overwritten.
+This script reads the raw data from the SQLite database, applies feature engineering and preprocessing, performs the train/test split, and saves the processed files in `data/processed/`
 
-### 6. Train the final model and save reusable model files
+### 7. Train the final model and save reusable model files
 
 Run the training script from the project root:
 
@@ -504,7 +515,7 @@ Generated files such as:
 
 are local outputs and are excluded via `.gitignore`.
 
-### 7. Run inference with the saved model
+### 8. Run inference with the saved model
 
 Run the reusable inference script from the project root:
 
@@ -523,7 +534,7 @@ This script:
 
 The script does not create new files. It only serves to demonstrate reusable inference with the saved model.
 
-### 8. Evaluate the saved model
+### 9. Evaluate the saved model
 
 Run the reusable evaluation script from the project root:
 
@@ -544,7 +555,7 @@ This script:
 The script does not create new files. It evaluates the already saved model on the processed test set.
 
 
-### 9. Run the notebooks
+### 10. Run the notebooks
 Open the `notebooks/` folder and follow the project step by step:
 
 - `01_data_understanding_eda.ipynb`
