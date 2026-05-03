@@ -190,7 +190,7 @@ Current and planned MLOps-oriented steps include:
 2. Reusable model-training and model-saving script  
 3. Reusable inference script using the saved model  
 4. Reusable evaluation script for the saved model  
-5. Initial experiment tracking with MLflow through `src/train_with_mlflow.py`
+5. Experiment tracking with MLflow through `src/train_with_mlflow.py`
 6. Model artifact storage  
 7. API-based inference  
 8. Containerization  
@@ -223,6 +223,7 @@ This project is being built step by step. The current progress is:
 - verification that the saved model can be reloaded and produces matching predictions and probabilities
 - creation of a reusable inference script (`src/predict_with_saved_model.py`) to load the saved model and generate predictions on prepared input data
 - creation of a reusable evaluation script (`src/evaluate_model.py`) to load the saved model, evaluate it on the processed test set, and print key classification metrics
+- extension of MLflow experiment tracking to log final-model parameters, evaluation metrics, evaluation artifacts, model metadata, feature names, and the trained Random Forest model
 - baseline model training
 - baseline model comparison using stratified cross-validation
 - test-set evaluation of the selected baseline model
@@ -348,11 +349,11 @@ Overall, the interpretability analysis showed that the tuned Random Forest is no
 
 ## Next Steps
 
-1. Continue the transition from notebook-based steps toward more modular MLOps components
+1. Add a lightweight SQL component for data storage and SQL-based exploratory checks
 
-2. Extend MLflow experiment tracking for future training and evaluation workflows
+2. Extend the project toward API-based model serving with FastAPI
 
-3. Extend the project toward model serving, containerization, and workflow automation
+3. Continue toward containerization and optional workflow automation
 
 ---
 
@@ -449,21 +450,48 @@ This script:
 Generated files in `artifacts/` are local outputs and are not intended to be tracked in Git.
 
 ### Optional: Run training with MLflow tracking
+
+Run the MLflow training script from the project root:
+
+
 ```bash
 python src/train_with_mlflow.py
 ```
 This script:
 
-- logs model parameters and metrics
-- tracks experiments using MLflow
-- stores runs locally in `mlflow.db`
-- allows inspection via the MLflow UI
+- loads the processed train/test datasets from `data/processed/`
+- trains the final tuned Random Forest model using the same parameters documented in `artifacts/model/model_metadata.json`
+- evaluates the model with the selected decision threshold of `0.50`
+- logs model parameters and evaluation metrics to MLflow
+- logs evaluation artifacts, including the confusion matrix and classification report
+- logs metadata artifacts, including feature names and model metadata
+- logs the trained Random Forest model as an MLflow model artifact
+
+The MLflow run contains the following artifact groups:
+
+```bash
+evaluation/
+├── classification_report.json
+├── classification_report.txt
+├── confusion_matrix.csv
+└── confusion_matrix.png
+
+metadata/
+├── feature_names.json
+└── model_metadata.json
+```
+
+The script also logs the trained model under the MLflow run artifacts.
 
 To launch the MLflow UI:
 ```bash
 mlflow ui
 ```
-Then open: http://localhost:5000
+Then open: 
+
+```bash
+http://localhost:5000
+```
 
 To stop the MLflow UI server, press `Ctrl + C` in the terminal where it is running.
 
