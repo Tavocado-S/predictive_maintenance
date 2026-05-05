@@ -97,7 +97,9 @@ To run the project from the beginning, download the **AI4I 2020 Predictive Maint
 
 `data/raw/ai4i2020.csv`
 
-The project now includes a reusable preprocessing script, `src/make_dataset.py`, which loads the raw dataset, applies the established feature engineering and preprocessing steps, and saves the processed train/test datasets to `data/processed/`.
+The project now includes a lightweight SQLite layer. The script `src/create_database.py` loads the raw CSV into a local SQLite database, and `src/make_dataset.py` reads from that database to generate the processed train/test datasets.
+
+The preprocessing script also saves the fitted preprocessing pipeline as `artifacts/model/preprocessor.joblib`, which will be reused later for raw-data inference.
 
 Notebook 02 still documents the preprocessing and feature-engineering stage in an exploratory and transparent way, while the script provides a more reusable project component for later modeling and MLOps-oriented steps.
 
@@ -193,10 +195,11 @@ Current and planned MLOps-oriented steps include:
 3. Reusable inference script using the saved model  
 4. Reusable evaluation script for the saved model  
 5. Experiment tracking with MLflow through `src/train_with_mlflow.py`
-6. Model artifact storage  
-7. API-based inference  
-8. Containerization  
-9. Optional workflow automation
+6. Model artifact storage, including the trained model, feature names, model metadata, and fitted preprocessing pipeline  
+7. API-based inference with FastAPI  
+8. Optional Streamlit frontend for user-friendly interaction with the API  
+9. Containerization  
+10. Optional workflow automation
 
 ---
 
@@ -247,14 +250,18 @@ This project is being built step by step. The current progress is:
 - permutation importance analysis
 - SHAP-based global and local explanations
 - comparison of interpretability methods for the final model
-- Added a lightweight SQLite database layer for storing the raw AI4I dataset.
-- Created `src/create_database.py` to load the raw CSV into SQLite and run basic SQL validation checks.
-- Updated `src/make_dataset.py` to read raw data from SQLite instead of directly from CSV.
+- added a lightweight SQLite database layer for storing the raw AI4I dataset.
+- created `src/create_database.py` to load the raw CSV into SQLite and run basic SQL validation checks.
+- updated `src/make_dataset.py` to read raw data from SQLite instead of directly from CSV
+- saved the fitted preprocessing pipeline as `artifacts/model/preprocessor.joblib`
+- prepared the project for future raw-data inference by making the training-time preprocessing reusable
 
 ### Planned
-- API-based model serving
+- API-based model serving with FastAPI
+- optional Streamlit frontend that sends user input to the FastAPI prediction endpoint
 - Dockerization
 - workflow automation
+
 ---
 
 ## Key Findings from EDA
@@ -354,8 +361,9 @@ Overall, the interpretability analysis showed that the tuned Random Forest is no
 
 ## Next Steps
 
-1. Extend the project toward API-based model serving with FastAPI
-2. Continue toward containerization and optional workflow automation
+1. Create a FastAPI prediction endpoint that accepts raw machine input and returns a machine-failure prediction
+2. Add an optional Streamlit frontend that sends user input to the FastAPI endpoint and displays the prediction result
+3. Continue toward containerization and optional workflow automation
 
 ---
 
@@ -372,9 +380,13 @@ Overall, the interpretability analysis showed that the tuned Random Forest is no
 - SHAP
 - MLflow
 - Jupyter Notebook
+- SQLite
+- joblib
+
 
 ### Planned
 - FastAPI
+- Streamlit
 - Docker
 
 Planned tools will be added as the project progresses.
@@ -426,7 +438,7 @@ This script loads the raw AI4I CSV file from `data/raw/ai4i2020.csv`, creates a 
 
 It also runs basic validation checks such as row count, failure count, failure rate, failure rate by product type, and missing-value checks.
 
-### 6. Generate the processed datasets
+### 6. Generate the processed datasets and preprocessing artifact
 
 Run the reusable preprocessing script from the project root:
 
@@ -436,12 +448,29 @@ python src/make_dataset.py
 
 This script:
 
-- loads the raw dataset from `data/raw/ai4i2020.csv`
-- applies the established feature engineering and preprocessing steps
+- reads the raw data from the SQLite database at data/database/]`predictive_maintenance.db`
+- loads `the ai4i_raw` table
+- applies the established feature engineering steps
 - creates a stratified train-test split
+- fits the preprocessing pipeline on the training data only
+- transforms the train and test datasets
 - saves the processed outputs to `data/processed/`
+- saves the fitted preprocessing pipeline to `artifacts/model/preprocessor.joblib`
 
 This script reads the raw data from the SQLite database, applies feature engineering and preprocessing, performs the train/test split, and saves the processed files in `data/processed/`
+
+Generated processed files:
+- `data/processed/X_train_prepared.csv`
+- `data/processed/X_test_prepared.csv`
+- `data/processed/y_train.csv`
+- `data/processed/y_test.csv`
+
+Generated preprocessing artifact:
+- `artifacts/model/preprocessor.joblib`
+
+The fitted preprocessing artifact is required for future raw-data inference, because incoming raw machine data must be transformed with the same preprocessing logic used during training before it is passed to the trained model.
+
+Generated files in `artifacts/` are local outputs and are not intended to be tracked in Git.
 
 ### 7. Train the final model and save reusable model files
 

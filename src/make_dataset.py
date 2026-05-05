@@ -16,6 +16,7 @@ Outputs:
 """
 
 from pathlib import Path
+import joblib
 import pandas as pd
 import sqlite3
 
@@ -35,6 +36,9 @@ IDENTIFIER_COLUMNS = ["UDI", "Product ID"]
 
 DATABASE_FILENAME = "predictive_maintenance.db"
 TABLE_NAME = "ai4i_raw"
+
+MODEL_ARTIFACTS_DIR = "artifacts/model"
+PREPROCESSOR_FILENAME = "preprocessor.joblib"
 
 
 def get_project_root() -> Path:
@@ -188,11 +192,30 @@ def save_processed_data(
     y_test.to_csv(processed_dir / "y_test.csv", index=False)
 
 
+def save_preprocessor(
+    preprocessor: ColumnTransformer,
+    artifacts_dir: Path,
+):
+    """
+    Save the fitted preprocessing pipeline as a reusable model artifact.
+
+    This artifact is required for future raw-data inference, because raw input
+    must be transformed with the same fitted preprocessing logic used during
+    training.
+    """
+    artifacts_dir.mkdir(parents=True, exist_ok=True)
+
+    preprocessor_path = artifacts_dir / PREPROCESSOR_FILENAME
+    joblib.dump(preprocessor, preprocessor_path)
+
+    return preprocessor_path
+
 def main():
     project_root = get_project_root()
 
     database_path = project_root / "data" / "database" / DATABASE_FILENAME
     processed_dir = project_root / "data" / "processed"
+    artifacts_dir = project_root / MODEL_ARTIFACTS_DIR
 
     print("Loading raw dataset from SQLite database...")
     df = load_raw_data(database_path, TABLE_NAME)
@@ -230,9 +253,16 @@ def main():
         y_test=y_test,
         processed_dir=processed_dir,
     )
+    
+    print("Saving fitted preprocessing pipeline...")
+    preprocessor_path = save_preprocessor(
+    preprocessor=preprocessor,
+    artifacts_dir=artifacts_dir,
+    )
 
     print("\nDone.")
     print(f"Saved files to: {processed_dir}")
+    print(f"Saved fitted preprocessor to: {preprocessor_path}")
     print("Existing files with the same names were overwritten if they were already present.")
     print(f"X_train_prepared shape: {X_train_prepared.shape}")
     print(f"X_test_prepared shape: {X_test_prepared.shape}")
