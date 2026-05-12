@@ -382,10 +382,9 @@ Overall, the interpretability analysis showed that the tuned Random Forest is no
 - Jupyter Notebook
 - SQLite
 - joblib
-
+- FastAPI
 
 ### Planned
-- FastAPI
 - Streamlit
 - Docker
 
