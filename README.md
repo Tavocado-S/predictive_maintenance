@@ -93,15 +93,28 @@ These failure-mode columns are useful for understanding the dataset, but they sh
 
 ### Data access
 
-To run the project from the beginning, download the **AI4I 2020 Predictive Maintenance Dataset** manually and place the raw CSV file in:
+The project expects the raw AI4I 2020 dataset to be available at:
 
 `data/raw/ai4i2020.csv`
 
-The project now includes a lightweight SQLite layer. The script `src/create_database.py` loads the raw CSV into a local SQLite database, and `src/make_dataset.py` reads from that database to generate the processed train/test datasets.
+For Windows users, the repository includes a lightweight PowerShell helper script:
 
-The preprocessing script also saves the fitted preprocessing pipeline as `artifacts/model/preprocessor.joblib`, which will be reused later for raw-data inference.
+```bash
+.\run_pipeline.ps1
+```
 
-Notebook 02 still documents the preprocessing and feature-engineering stage in an exploratory and transparent way, while the script provides a more reusable project component for later modeling and MLOps-oriented steps.
+If `data/raw/ai4i2020.csv` is missing, the script attempts to download the dataset ZIP from the UCI Machine Learning Repository, extract the CSV file, and save it under the expected project path.
+
+The direct UCI download URL may change in the future. If the automatic download fails, the dataset can still be downloaded manually and placed at:
+
+`data/raw/ai4i2020.csv`
+
+The project includes a lightweight SQLite layer. The script `src/create_database.py` loads the raw CSV into a local SQLite database, and `src/make_dataset.py` reads from that database to generate the processed train/test datasets.
+
+The preprocessing script also saves the fitted preprocessing pipeline as `artifacts/model/preprocessor.joblib`, which is reused for raw-data inference through the FastAPI endpoint.
+
+Notebook 02 still documents the preprocessing and feature-engineering stage in an exploratory and transparent way, while the scripts provide reusable project components for the MLOps-oriented workflow.
+
 
 ---
 
@@ -141,14 +154,17 @@ predictive-maintenance-ai4i/
 ├── artifacts/
 │   └── model/
 │
+├── images/
+│   └── cnc.png
+│
 ├── data/
 │   ├── raw/
 │   ├── database/
 │   └── processed/
 │
-├─notebooks/
+├── notebooks/
 │   ├── 01_data_understanding_eda.ipynb
-│  ├── 02_preprocessing_and_feature_engineering.ipynb
+│   ├── 02_preprocessing_and_feature_engineering.ipynb
 │   ├── 03_model_training_and_evaluation.ipynb
 │   ├── 04_hyperparameter_tuning_random_forest.ipynb
 │   ├── 05_xgboost_challenger_model.ipynb
@@ -161,8 +177,11 @@ predictive-maintenance-ai4i/
 │   ├── train_and_save_model.py
 │   ├── predict_with_saved_model.py
 │   ├── evaluate_model.py
-│   └── train_with_mlflow.py
+│   ├── train_with_mlflow.py
+│   └── api.py
 │
+├── streamlit_app.py
+├── run_pipeline.ps1
 ├── requirements.txt
 ├── README.md
 └── .gitignore
@@ -197,7 +216,7 @@ Current and planned MLOps-oriented steps include:
 5. Experiment tracking with MLflow through `src/train_with_mlflow.py`
 6. Model artifact storage, including the trained model, feature names, model metadata, and fitted preprocessing pipeline  
 7. API-based inference with FastAPI  
-8. Optional Streamlit frontend for user-friendly interaction with the API  
+8. Streamlit frontend for user-friendly interaction with the API
 9. Containerization  
 10. Optional workflow automation
 
@@ -255,12 +274,19 @@ This project is being built step by step. The current progress is:
 - updated `src/make_dataset.py` to read raw data from SQLite instead of directly from CSV
 - saved the fitted preprocessing pipeline as `artifacts/model/preprocessor.joblib`
 - prepared the project for future raw-data inference by making the training-time preprocessing reusable
+- created a FastAPI prediction endpoint in `src/api.py`
+- tested the FastAPI `/docs` interface
+- tested the FastAPI `/predict` endpoint
+- created a Streamlit frontend in `streamlit_app.py`
+- connected the Streamlit frontend to the FastAPI prediction endpoint
+- added a multi-page Streamlit app with project introduction, architecture overview, and model demo
+- added a lightweight PowerShell pipeline script (`run_pipeline.ps1`) for Windows-based semi-automation
+- automated the local training pipeline from dataset check/download to database creation, preprocessing, and model training
 
 ### Planned
-- API-based model serving with FastAPI
-- optional Streamlit frontend that sends user input to the FastAPI prediction endpoint
 - Dockerization
-- workflow automation
+- optional improvements to workflow automation
+- optional deployment preparation
 
 ---
 
@@ -361,9 +387,9 @@ Overall, the interpretability analysis showed that the tuned Random Forest is no
 
 ## Next Steps
 
-1. Create a FastAPI prediction endpoint that accepts raw machine input and returns a machine-failure prediction
-2. Add an optional Streamlit frontend that sends user input to the FastAPI endpoint and displays the prediction result
-3. Continue toward containerization and optional workflow automation
+1. Containerize the project with Docker
+2. Optionally improve workflow automation
+3. Prepare the project for optional deployment
 
 ---
 
@@ -383,9 +409,10 @@ Overall, the interpretability analysis showed that the tuned Random Forest is no
 - SQLite
 - joblib
 - FastAPI
+- Streamlit
+- PowerShell
 
 ### Planned
-- Streamlit
 - Docker
 
 Planned tools will be added as the project progresses.
@@ -402,148 +429,158 @@ cd predictive-maintenance-ai4i
 
 ### 2. Create and activate a virtual environment
 ```bash
-python -m venv venv
+python -m venv .venv
 ```
 
 Activate it:
 
-**Windows**
-```bash
-venv\Scripts\activate
+**Windows / PowerShell**
+```powershell
+.\.venv\Scripts\Activate.ps1
 ```
 
 **macOS / Linux**
 ```bash
-source venv/bin/activate
+source .venv/bin/activate
 ```
+
 
 ### 3. Install dependencies
 ```bash
 pip install -r requirements.txt
 ```
 
-### 4. Download and place the raw dataset
+### 4. Run the semi-automated training pipeline
 
-Download the **AI4I 2020 Predictive Maintenance Dataset** manually and place the raw CSV file in:
+On Windows / PowerShell, run:
+
+`.\run_pipeline.ps1`
+
+This script checks whether the raw dataset exists at:
 
 `data/raw/ai4i2020.csv`
 
-### 5. Create the SQLite database
+If the file is missing, the script attempts to download the AI4I 2020 dataset ZIP from the UCI Machine Learning Repository, extract the CSV file, and save it under the expected path.
+
+After the raw dataset is available, the script runs the local training pipeline:
 
 ```bash
 python src/create_database.py
-```
-This script loads the raw AI4I CSV file from `data/raw/ai4i2020.csv`, creates a local SQLite database at `data/database/predictive_maintenance.db`, and stores the raw data in the table `ai4i_raw`.
-
-It also runs basic validation checks such as row count, failure count, failure rate, failure rate by product type, and missing-value checks.
-
-### 6. Generate the processed datasets and preprocessing artifact
-
-Run the reusable preprocessing script from the project root:
-
-```bash
 python src/make_dataset.py
-```
-
-This script:
-
-- reads the raw data from the SQLite database at data/database/]`predictive_maintenance.db`
-- loads `the ai4i_raw` table
-- applies the established feature engineering steps
-- creates a stratified train-test split
-- fits the preprocessing pipeline on the training data only
-- transforms the train and test datasets
-- saves the processed outputs to `data/processed/`
-- saves the fitted preprocessing pipeline to `artifacts/model/preprocessor.joblib`
-
-This script reads the raw data from the SQLite database, applies feature engineering and preprocessing, performs the train/test split, and saves the processed files in `data/processed/`
-
-Generated processed files:
-- `data/processed/X_train_prepared.csv`
-- `data/processed/X_test_prepared.csv`
-- `data/processed/y_train.csv`
-- `data/processed/y_test.csv`
-
-Generated preprocessing artifact:
-- `artifacts/model/preprocessor.joblib`
-
-The fitted preprocessing artifact is required for future raw-data inference, because incoming raw machine data must be transformed with the same preprocessing logic used during training before it is passed to the trained model.
-
-Generated files in `artifacts/` are local outputs and are not intended to be tracked in Git.
-
-### 7. Train the final model and save reusable model files
-
-Run the training script from the project root:
-
-```bash
 python src/train_and_save_model.py
 ```
 
-This script:
+This creates or updates:
+```bash
+data/database/predictive_maintenance.db
+data/processed/X_train_prepared.csv
+data/processed/X_test_prepared.csv
+data/processed/y_train.csv
+data/processed/y_test.csv
+artifacts/model/preprocessor.joblib
+artifacts/model/random_forest_model.joblib
+artifacts/model/feature_names.json
+artifacts/model/model_metadata.json
+```
 
-- loads the processed train/test datasets from `data/processed/`
-- rebuilds and trains the final tuned Random Forest model
-- saves the trained model, feature names, and model metadata to `artifacts/model/`
-- reloads the saved model and verifies consistency on sample test data
+Note: the direct UCI download URL may change in the future. If the automatic download fails, download the AI4I 2020 dataset manually and place the CSV file at:
 
-Generated files in `artifacts/` are local outputs and are not intended to be tracked in Git.
+`data/raw/ai4i2020.csv`
 
-### Optional: Run training with MLflow tracking
+Then run the pipeline `.\run_pipeline.ps1` script again.
+
+Generated files in `data/database/`, `data/processed/`, and `artifacts/model/` are local outputs and are not intended to be tracked in Git.
+
+### 5. Optional: Run the pipeline manually
+
+The same training pipeline can also be executed step by step:
+
+```bash
+python src/create_database.py
+python src/make_dataset.py
+python src/train_and_save_model.py
+```
+
+`src/create_database.py` loads the raw AI4I CSV file from `data/raw/ai4i2020.csv`, creates a local SQLite database at `data/database/predictive_maintenance.db`, and stores the raw data in the table `ai4i_raw`.
+
+`src/make_dataset.py` reads the raw data from SQLite, applies feature engineering and preprocessing, performs a stratified train/test split, saves the processed datasets, and stores the fitted preprocessing pipeline as `artifacts/model/preprocessor.joblib`.
+
+`src/train_and_save_model.py` loads the processed train/test datasets, trains the final tuned Random Forest model, and saves the trained model, feature names, and model metadata to `artifacts/model/`.
+
+### 6. Run the FastAPI prediction service
+
+After the model artifacts have been created, start the FastAPI app:
+
+```bash
+uvicorn src.api:app --reload
+```
+
+
+Then open:
+
+`http://127.0.0.1:8000/docs`
+
+The `/predict` endpoint accepts raw machine input and returns:
+
+- the predicted class
+- the machine-failure probability
+- the decision threshold used by the model
+
+### 7. Run the Streamlit frontend
+
+In a second terminal, activate the virtual environment again and run:
+
+```bash
+streamlit run streamlit_app.py
+```
+
+The Streamlit app provides a simple user interface for exploring the project and testing the prediction endpoint.
+
+For the full demo workflow, use two terminals:
+
+**Terminal 1**
+```bash
+uvicorn src.api:app --reload
+```
+
+**Terminal 2**
+```bash
+streamlit run streamlit_app.py
+```
+
+### 8. Optional: Run training with MLflow tracking
 
 Run the MLflow training script from the project root:
-
 
 ```bash
 python src/train_with_mlflow.py
 ```
+
 This script:
 
-- loads the processed train/test datasets from `data/processed/`
-- trains the final tuned Random Forest model using the same parameters documented in `artifacts/model/model_metadata.json`
-- evaluates the model with the selected decision threshold of `0.50`
+- loads the processed train/test datasets from data/processed/
+- trains the final tuned Random Forest model
+- evaluates the model with the selected decision threshold of 0.50
 - logs model parameters and evaluation metrics to MLflow
 - logs evaluation artifacts, including the confusion matrix and classification report
 - logs metadata artifacts, including feature names and model metadata
 - logs the trained Random Forest model as an MLflow model artifact
 
-The MLflow run contains the following artifact groups:
-
-```bash
-evaluation/
-├── classification_report.json
-├── classification_report.txt
-├── confusion_matrix.csv
-└── confusion_matrix.png
-
-metadata/
-├── feature_names.json
-└── model_metadata.json
-```
-
-The script also logs the trained model under the MLflow run artifacts.
-
 To launch the MLflow UI:
+
 ```bash
 mlflow ui
 ```
-Then open: 
 
-```bash
-http://localhost:5000
-```
+Then open:
+
+`http://localhost:5000`
 
 To stop the MLflow UI server, press `Ctrl + C` in the terminal where it is running.
 
-Note:  
-Generated files such as:
+Note: generated files such as `mlflow.db`, `mlruns/`, and `artifacts/model/` are local outputs and are excluded via `.gitignore`.
 
-- `mlflow.db`
-- `mlruns/`
-- `artifacts/model/`
-
-are local outputs and are excluded via `.gitignore`.
-
-### 8. Run inference with the saved model
+### 9. Optional: Run inference with the saved model
 
 Run the reusable inference script from the project root:
 
@@ -551,18 +588,9 @@ Run the reusable inference script from the project root:
 python src/predict_with_saved_model.py
 ```
 
-This script:
+This script loads the saved Random Forest model, loads the saved feature names, generates predictions on a small sample from the processed test set, and prints the results in the terminal.
 
-- loads the saved Random Forest model from artifacts/model/
-- loads the saved feature names
-- loads a small sample from data/processed/X_test_prepared.csv
-- aligns the input columns with the saved feature names
-- generates machine-failure predictions and failure probabilities
-- prints the prediction results in the terminal
-
-The script does not create new files. It only serves to demonstrate reusable inference with the saved model.
-
-### 9. Evaluate the saved model
+### 10. Optional: Evaluate the saved model
 
 Run the reusable evaluation script from the project root:
 
@@ -570,20 +598,11 @@ Run the reusable evaluation script from the project root:
 python src/evaluate_model.py
 ```
 
-This script:
-
-- loads the saved Random Forest model from artifacts/model/
-- loads the saved feature names
-- loads the processed test dataset from data/processed/
-- aligns the test columns with the saved feature names
-- generates predictions and failure probabilities
-- prints Precision, Recall, F1-score, ROC-AUC, and Average Precision
-- prints the confusion matrix
-
-The script does not create new files. It evaluates the already saved model on the processed test set.
+This script evaluates the already saved model on the processed test set and prints Precision, Recall, F1-score, ROC-AUC, Average Precision, and the confusion matrix.
 
 
-### 10. Run the notebooks
+### 11. Run the notebooks
+
 Open the `notebooks/` folder and follow the project step by step:
 
 - `01_data_understanding_eda.ipynb`
@@ -594,7 +613,8 @@ Open the `notebooks/` folder and follow the project step by step:
 - `06_threshold_analysis_random_forest.ipynb`
 - `07_model_interpretability_random_forest.ipynb`
 
-Notebook 02 documents the preprocessing logic transparently, while the reusable script `src/make_dataset.py` provides the script-based version of that step for the evolving project workflow.
+The notebooks document the Data Science reasoning transparently, while the scripts provide the reusable project workflow.
+
 
 ---
 
