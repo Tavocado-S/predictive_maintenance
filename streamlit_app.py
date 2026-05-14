@@ -1,7 +1,11 @@
 import requests
 import streamlit as st
+import os
+from pathlib import Path
 
-API_URL = "http://127.0.0.1:8000/predict"
+API_URL = os.getenv("API_URL", "http://127.0.0.1:8000") 
+BASE_DIR = Path(__file__).resolve().parent
+IMAGE_PATH = BASE_DIR / "images" / "cnc.png"
 
 st.set_page_config(
     page_title="Predictive Maintenance App",
@@ -14,7 +18,7 @@ def show_project_introduction():
     st.title("Predictive Maintenance with AI4I 2020")
 
     st.image(
-        "C:\git\Predictive_Maintenance\images\cnc.png",
+        str(IMAGE_PATH),
         caption="CNC machining process used as visual context for predictive maintenance.",
         width=600,
     )
@@ -322,8 +326,8 @@ def show_model_demo():
 
     if st.button("Predict machine failure", type="primary"):
         try:
-            response = requests.post(API_URL, json=input_payload, timeout=10)
-
+            response = requests.post(f"{API_URL}/predict", json=input_payload)
+            
             if response.status_code == 200:
                 result = response.json()
 

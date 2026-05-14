@@ -182,8 +182,13 @@ predictive-maintenance-ai4i/
 │
 ├── streamlit_app.py
 ├── run_pipeline.ps1
+├── Dockerfile.api
+├── Dockerfile.streamlit
+├── docker-compose.yml
 ├── requirements.txt
+├── requirements-docker.txt
 ├── README.md
+├── .dockerignore
 └── .gitignore
 ```
 
@@ -217,7 +222,7 @@ Current and planned MLOps-oriented steps include:
 6. Model artifact storage, including the trained model, feature names, model metadata, and fitted preprocessing pipeline  
 7. API-based inference with FastAPI  
 8. Streamlit frontend for user-friendly interaction with the API
-9. Containerization  
+9. Containerized execution with Docker Compose for the FastAPI backend and Streamlit frontend  
 10. Optional workflow automation
 
 ---
@@ -282,9 +287,13 @@ This project is being built step by step. The current progress is:
 - added a multi-page Streamlit app with project introduction, architecture overview, and model demo
 - added a lightweight PowerShell pipeline script (`run_pipeline.ps1`) for Windows-based semi-automation
 - automated the local training pipeline from dataset check/download to database creation, preprocessing, and model training
+- added Dockerfiles for the FastAPI backend and Streamlit frontend
+- added a Docker Compose setup to run both services together
+- added a Docker-specific requirements file for the container runtime environment
+- configured the Streamlit app to call the FastAPI service through an environment-based API URL
+- verified that the Dockerized Streamlit frontend successfully calls the Dockerized FastAPI prediction endpoint
 
 ### Planned
-- Dockerization
 - optional improvements to workflow automation
 - optional deployment preparation
 
@@ -387,9 +396,8 @@ Overall, the interpretability analysis showed that the tuned Random Forest is no
 
 ## Next Steps
 
-1. Containerize the project with Docker
-2. Optionally improve workflow automation
-3. Prepare the project for optional deployment
+1. Optionally improve workflow automation
+2. Prepare the project for optional deployment
 
 ---
 
@@ -411,11 +419,8 @@ Overall, the interpretability analysis showed that the tuned Random Forest is no
 - FastAPI
 - Streamlit
 - PowerShell
-
-### Planned
 - Docker
-
-Planned tools will be added as the project progresses.
+- Docker Compose
 
 ---
 
@@ -536,6 +541,8 @@ streamlit run streamlit_app.py
 
 The Streamlit app provides a simple user interface for exploring the project and testing the prediction endpoint.
 
+When running locally, the Streamlit app calls the FastAPI backend through `http://127.0.0.1:8000`. When running with Docker Compose, this URL is provided through the `API_URL` environment variable.
+
 For the full demo workflow, use two terminals:
 
 **Terminal 1**
@@ -548,7 +555,43 @@ uvicorn src.api:app --reload
 streamlit run streamlit_app.py
 ```
 
-### 8. Optional: Run training with MLflow tracking
+### 8. Run the Dockerized application with Docker Compose
+
+The project also includes a Docker Compose setup for running the FastAPI backend and Streamlit frontend together.
+
+Before starting the Dockerized application, make sure the local model artifacts have been created:
+
+```powershell
+.\run_pipeline.ps1
+```
+
+This step is required because model artifacts are generated locally and are not tracked in Git.
+
+Then start both Docker services from the project root:
+
+```bash
+docker compose up --build
+```
+
+After the containers have started, open:
+
+- FastAPI docs: `http://localhost:8000/docs`
+- Streamlit app: `http://localhost:8501`
+
+In the Docker Compose setup, the Streamlit container calls the FastAPI container internally through `http://api:8000`
+
+This is configured through the `API_URL` environment variable in `docker-compose.yml`.
+
+To stop the running containers, press `Ctrl + C` in the terminal and then run:
+
+```bash
+docker compose down
+```
+
+Note: the Dockerized application depends on the local model artifacts in `artifacts/model/`. If these files are missing, run `.\run_pipeline.ps1` before starting Docker Compose.
+
+
+### 9. Optional: Run training with MLflow tracking
 
 Run the MLflow training script from the project root:
 
@@ -580,7 +623,7 @@ To stop the MLflow UI server, press `Ctrl + C` in the terminal where it is runni
 
 Note: generated files such as `mlflow.db`, `mlruns/`, and `artifacts/model/` are local outputs and are excluded via `.gitignore`.
 
-### 9. Optional: Run inference with the saved model
+### 10. Optional: Run inference with the saved model
 
 Run the reusable inference script from the project root:
 
@@ -590,7 +633,7 @@ python src/predict_with_saved_model.py
 
 This script loads the saved Random Forest model, loads the saved feature names, generates predictions on a small sample from the processed test set, and prints the results in the terminal.
 
-### 10. Optional: Evaluate the saved model
+### 11. Optional: Evaluate the saved model
 
 Run the reusable evaluation script from the project root:
 
@@ -601,7 +644,7 @@ python src/evaluate_model.py
 This script evaluates the already saved model on the processed test set and prints Precision, Recall, F1-score, ROC-AUC, Average Precision, and the confusion matrix.
 
 
-### 11. Run the notebooks
+### 12. Run the notebooks
 
 Open the `notebooks/` folder and follow the project step by step:
 
