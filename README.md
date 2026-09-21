@@ -392,6 +392,27 @@ The main findings from this stage are:
 
 Overall, the interpretability analysis showed that the tuned Random Forest is not only a strong predictive model, but also a model whose behavior can be explained in a credible and business-relevant way.
 
+## Model Performance (Test Set)
+
+The final tuned Random Forest model was evaluated on the held-out test set (2,000 samples, 68 failures) at the default decision threshold of 0.50:
+
+| Metric | Value |
+|---|---|
+| Precision | 0.89 |
+| Recall | 0.84 |
+| F1-score | 0.86 |
+| ROC-AUC | 0.97 |
+| Average Precision | 0.88 |
+
+Confusion matrix:
+
+|  | Predicted: No failure | Predicted: Failure |
+|---|---|---|
+| **Actual: No failure** | 1925 | 7 |
+| **Actual: Failure** | 11 | 57 |
+
+The model correctly identifies 57 of 68 real machine failures while producing only 7 false alarms out of 1,932 non-failure cases.
+
 ---
 
 ## Next Steps
